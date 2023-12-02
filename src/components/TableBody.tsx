@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { User, Column } from '../types';
 
 interface TableBodyProps {
@@ -22,7 +23,12 @@ const TableBody = ({ tableData, columns }: TableBodyProps) => {
                   tData
                 ) : (
                   <td key={accessor}>
-                    <h4>With link {tdataToString}</h4>
+                    <Link
+                      to={`planet/${user.homeworld}`}
+                      state={{ name: user.homeworld, data: user.planetData }}
+                    >
+                      {tdataToString}
+                    </Link>
                   </td>
                 );
               }

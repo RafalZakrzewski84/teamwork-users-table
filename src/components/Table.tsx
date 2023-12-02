@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getColumnsFromUserData } from '../utils';
-import { User, Row } from '../types';
+import { User } from '../types';
 
 import TableBody from './TableBody';
 import TableHead from './TableHead';
@@ -12,9 +12,13 @@ interface TableProps {
 const Table = ({ users }: TableProps) => {
   const [tableData, setTableData] = useState<User[]>([]);
   const [columns, setColumns] = useState<any>([]);
+  const [sortField, setSortField] = useState('');
+  const [order, setOrder] = useState('asc');
 
   useEffect(() => {
     setTableData(users);
+    setSortField('');
+    setOrder('asc');
 
     if (users.length > 0) {
       const columns = getColumnsFromUserData(users[0]);
@@ -24,7 +28,7 @@ const Table = ({ users }: TableProps) => {
 
   const handleSorting = (sortField: string, sortOrder: string) => {
     if (!sortField) return;
-    const sorted = [...tableData].sort((a: Row, b: Row) => {
+    const sorted = [...tableData].sort((a: User, b: User) => {
       if (!a[sortField]) return 1;
       if (!b[sortField]) return -1;
       if (a[sortField] === null && b[sortField] === null) return 0;
@@ -41,7 +45,14 @@ const Table = ({ users }: TableProps) => {
     <div>
       {tableData && (
         <table className="table">
-          <TableHead columns={columns} handleSorting={handleSorting} />
+          <TableHead
+            columns={columns}
+            handleSorting={handleSorting}
+            sortField={sortField}
+            handleSetSortField={setSortField}
+            order={order}
+            handleSetOrder={setOrder}
+          />
           <TableBody columns={columns} tableData={tableData} />
         </table>
       )}

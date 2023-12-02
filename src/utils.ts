@@ -45,7 +45,7 @@ export const getUsers = async (usersUrl: string) => {
 
     return { next, previous, users };
   } catch (error) {
-    console.log(error);
+    console.log('Error when fetching users data', error);
   }
 };
 

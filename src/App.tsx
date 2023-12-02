@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { Outlet } from 'react-router-dom';
 import { getUsers } from './utils';
-import { User } from './types';
+import { User, Result } from './types';
 
 import Table from './components/Table';
 import Button from './components/Button';
@@ -12,41 +14,72 @@ function App() {
   const [previous, setPrevious] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState('');
+
+  const handleResult = useCallback((result: Result) => {
+    const { next, previous, users } = result;
+
+    const storedUsers = window.localStorage.getItem('users');
+    if (storedUsers) {
+      setUsers(JSON.parse(storedUsers));
+    } else {
+      setUsers(users);
+    }
+
+    setNext(next);
+    setPrevious(previous);
+  }, []);
+
+  const fetchUsers = useCallback(
+    async (url: string) => {
+      setLoading(true);
+      const result = await getUsers(url);
+
+      if (result) {
+        window.localStorage.setItem('users', JSON.stringify(result.users));
+        handleResult(result);
+      }
+
+      setLoading(false);
+    },
+    [handleResult],
+  );
 
   async function handleFetchUsers(url: string) {
-    setLoading(true);
-    const result = await getUsers(url);
-    if (result) {
-      const { next, previous, users } = result;
-      setNext(next);
-      setPrevious(previous);
-      setUsers(users);
-      setLoading(false);
-    }
+    fetchUsers(url);
   }
 
   useEffect(() => {
-    async function fetchUsers() {
-      setLoading(true);
-      const result = await getUsers('https://swapi.dev/api/people/');
+    fetchUsers('https://swapi.dev/api/people/');
+  }, [fetchUsers]);
 
-      if (result) {
-        const { next, previous, users } = result;
-        setNext(next);
-        setPrevious(previous);
-        setUsers(users);
-        setLoading(false);
+  const handleSearchUsers = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setSearchText(e.target.value);
+  };
+
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      if (typeof user.name === 'string') {
+        return user.name.toLowerCase().indexOf(searchText) !== -1;
       }
-    }
-    fetchUsers();
-  }, []);
+      return false;
+    });
+  }, [users, searchText]);
 
   return (
     <div className="App">
       <div>
         <h1>Table Title</h1>
       </div>
-      {users && <Table users={users} />}
+      <div>
+        <input
+          value={searchText}
+          onChange={handleSearchUsers}
+          disabled={loading}
+        />
+      </div>
+      <div>{users && <Table users={filteredUsers} />}</div>
       <div>
         <Button
           label={'Previous'}
@@ -62,6 +95,12 @@ function App() {
         />
       </div>
       {loading && <p>Loading User Data...</p>}
+      {createPortal(
+        <div id="modal">
+          <Outlet />
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }

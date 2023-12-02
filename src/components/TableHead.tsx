@@ -1,22 +1,30 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { Column } from '../types';
 
 interface TableHeadProps {
   columns: Column[];
+  sortField: string;
+  handleSetSortField: (sortField: string) => void;
+  order: string;
+  handleSetOrder: (order: string) => void;
   handleSorting: (sortField: string, sortOrder: string) => void;
 }
 
-const TableHead = ({ columns, handleSorting }: TableHeadProps) => {
-  const [sortField, setSortField] = useState('');
-  const [order, setOrder] = useState('asc');
-
+const TableHead = ({
+  columns,
+  sortField,
+  handleSetSortField,
+  order,
+  handleSetOrder,
+  handleSorting,
+}: TableHeadProps) => {
   const handleSortingChange = (accessor: string) => {
     const sortOrder =
       accessor === sortField && order === 'asc' ? 'desc' : 'asc';
-    setSortField(accessor);
-    setOrder(sortOrder);
+    handleSetSortField(accessor);
+    handleSetOrder(sortOrder);
     handleSorting(accessor, sortOrder);
   };
 
