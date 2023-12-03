@@ -3,7 +3,7 @@ name: user_table
 on:
   push:
     branches:
-      - teamwork-users-table
+      - master
 
 jobs:
   builds:
