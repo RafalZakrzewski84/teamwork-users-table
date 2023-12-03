@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getColumnsFromUserData } from '../utils';
 import { User } from '../types';
+import { createUseStyles } from 'react-jss';
+
+import styles from './TableStyles';
 
 import TableBody from './TableBody';
 import TableHead from './TableHead';
@@ -8,8 +11,11 @@ import TableHead from './TableHead';
 interface TableProps {
   users: User[];
 }
+const useStyles = createUseStyles(styles);
 
 const Table = ({ users }: TableProps) => {
+  const classes = useStyles();
+
   const [tableData, setTableData] = useState<User[]>([]);
   const [columns, setColumns] = useState<any>([]);
   const [sortField, setSortField] = useState('');
@@ -42,19 +48,23 @@ const Table = ({ users }: TableProps) => {
   };
 
   return (
-    <div>
-      {tableData && (
-        <table className="table">
-          <TableHead
-            columns={columns}
-            handleSorting={handleSorting}
-            sortField={sortField}
-            handleSetSortField={setSortField}
-            order={order}
-            handleSetOrder={setOrder}
-          />
-          <TableBody columns={columns} tableData={tableData} />
-        </table>
+    <div className={classes.tableContainer}>
+      {users.length > 0 ? (
+        tableData && (
+          <table className={classes.table}>
+            <TableHead
+              columns={columns}
+              handleSorting={handleSorting}
+              sortField={sortField}
+              handleSetSortField={setSortField}
+              order={order}
+              handleSetOrder={setOrder}
+            />
+            <TableBody columns={columns} tableData={tableData} />
+          </table>
+        )
+      ) : (
+        <div className={classes.noUsers}>No user matches</div>
       )}
     </div>
   );
