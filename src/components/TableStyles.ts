@@ -6,7 +6,7 @@ const styles = {
     maxWidth: '100%',
     flex: 1,
     [sizes.down('xl')]: {
-      width: '750px',
+      width: '50%',
     },
     [sizes.down('md')]: {
       width: '70%',
